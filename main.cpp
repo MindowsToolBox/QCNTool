@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     //添加命令行参数
     QCoreApplication::setApplicationName("QCNTool");
-    QCoreApplication::setApplicationVersion("1.4.5");
+    QCoreApplication::setApplicationVersion("1.4.7");
     QCommandLineParser parser;
     parser.setApplicationDescription("a tool to download/flash qcn from/to your phone");
     parser.addHelpOption();
@@ -113,13 +113,13 @@ int main(int argc, char *argv[])
         QString path;
         if (cpath == "")
         {
-            cpath = QDir().currentPath();
+            cpath = QDir().currentPath()+"/";
         }
         if (cname == "")
         {
         QDateTime dteNow = QDateTime::currentDateTime();
         QString fnl = dteNow.toString("smh_d_M_yyyy").replace(" ","_").replace(":","_");
-        cname = "/QCN_"+fnl+".qcn";
+        cname = "QCN_"+fnl+".qcn";
         }
         path = cpath + cname;
         int renas2;
