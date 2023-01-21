@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     //添加命令行参数
     QCoreApplication::setApplicationName("QCNTool");
-    QCoreApplication::setApplicationVersion("1.4.7");
+    QCoreApplication::setApplicationVersion("1.4.8");
     QCommandLineParser parser;
     parser.setApplicationDescription("a tool to download/flash qcn from/to your phone");
     parser.addHelpOption();
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
         QString path;
         if (cpath == "")
         {
-            cpath = QDir().currentPath()+"/";
+            cpath = QDir().currentPath();
         }
         if (cname == "")
         {
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
         QString fnl = dteNow.toString("smh_d_M_yyyy").replace(" ","_").replace(":","_");
         cname = "QCN_"+fnl+".qcn";
         }
-        path = cpath + cname;
+        path = QDir::cleanPath(cpath +QDir::separator()+ cname);
         int renas2;
         std::cout << "\nReading QCN from phone...";
         if (!QLIB_BackupNVFromMobileToQCN(info.hndl,path.toLocal8Bit().data(),&renas2))
