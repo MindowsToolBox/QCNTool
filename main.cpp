@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     //添加命令行参数
     QCoreApplication::setApplicationName("QCNTool");
-    QCoreApplication::setApplicationVersion("1.2");
+    QCoreApplication::setApplicationVersion("1.4.5");
     QCommandLineParser parser;
     parser.setApplicationDescription("a tool to download/flash qcn from/to your phone");
     parser.addHelpOption();
@@ -39,13 +39,18 @@ int main(int argc, char *argv[])
     QCommandLineOption targetpath(QStringList() << "f" << "file",
                                   "qcn file path",
                                   "string");
+    QCommandLineOption targetname(QStringList() << "n" << "name",
+                                  "qcn file name",
+                                  "string");
     parser.addOption(targetport);
     parser.addOption(targetpath);
+    parser.addOption(targetname);
     parser.addOption(writeqcn);
     parser.addOption(readqcn);
     parser.process(a);
     int cport= parser.value(targetport).toInt();
     QString cpath = parser.value(targetpath);
+    QString cname = parser.value(targetname);
     DiagInfo info;
     info.portnum = cport;
 
@@ -63,7 +68,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    std::cout << "a small free tool to flash qcn into your phone\n"
+    std::cout << "a small free tool to flash/backup qcn into/from your phone\n"
               << "Modified by Zi_Cai\n";
 
     if (!ConnectDevice(info))
@@ -95,6 +100,8 @@ int main(int argc, char *argv[])
             if (!QLIB_NV_WriteNVsToMobile(info.hndl,&res2))
             {
                 std::cout << " error";
+                QLIB_DisconnectServer(info.hndl);
+                return 1;
             }else{
                 std::cout << " OK";
             }
@@ -103,18 +110,24 @@ int main(int argc, char *argv[])
     }
     if (parser.isSet(readqcn))
     {
+        QString path;
         if (cpath == "")
         {
             cpath = QDir().currentPath();
         }
-        std::cout << "\nReading QCN from phone...";
-        int renas2;
+        if (cname == "")
+        {
         QDateTime dteNow = QDateTime::currentDateTime();
         QString fnl = dteNow.toString("smh_d_M_yyyy").replace(" ","_").replace(":","_");
-        QString path = cpath +"/QCN_"+fnl+".qcn";
+        cname = "/QCN_"+fnl+".qcn";
+        }
+        path = cpath + cname;
+        int renas2;
+        std::cout << "\nReading QCN from phone...";
         if (!QLIB_BackupNVFromMobileToQCN(info.hndl,path.toLocal8Bit().data(),&renas2))
         {
             std::cout <<" error";
+            QLIB_DisconnectServer(info.hndl);
             return 1;
         }
         else
@@ -122,6 +135,7 @@ int main(int argc, char *argv[])
             std::cout <<" OK";
             std::cout <<"\nBackup file : ";
             std::cout <<path.toStdString().data();
+            std::cout <<"\n";
         }
     }
     QLIB_DisconnectServer(info.hndl);
