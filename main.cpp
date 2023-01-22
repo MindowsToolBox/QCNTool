@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     //添加命令行参数
     QCoreApplication::setApplicationName("QCNTool");
-    QCoreApplication::setApplicationVersion("1.4.8");
+    QCoreApplication::setApplicationVersion("1.4.9");
     QCommandLineParser parser;
     parser.setApplicationDescription("a tool to download/flash qcn from/to your phone");
     parser.addHelpOption();
@@ -93,6 +93,8 @@ int main(int argc, char *argv[])
         if (!QLIB_NV_LoadNVsFromQCN(info.hndl,cpath.toLocal8Bit().data(),&get1,&get2))
         {
             std::cout << " error";
+            QLIB_DisconnectServer(info.hndl);
+            return 1;
         }else{
             std::cout << " OK";
             std::cout << "\nWriting Data File to phone...";
