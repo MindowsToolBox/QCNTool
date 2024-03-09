@@ -212,7 +212,7 @@ bool ConnectDevice(DiagInfo &info)
         return false;
     }
 
-    if (!SetSIMDual(info,(ReadIMEI(info,0) == ReadIMEI(info,1))))
+    if (!SetSIMDual(info,!(ReadIMEI(info,0) == ReadIMEI(info,1))))
     {
         return false;
     }

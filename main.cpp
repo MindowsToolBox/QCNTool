@@ -2,7 +2,12 @@
 #include <QTextStream>
 #include <iostream>
 #include "stdlib.h"
-#include "main.h"
+#include "QThread"
+#include "QtCore"
+#include "QCLoader.h"
+#include "QtSerialPort/QSerialPort"
+#include "QtSerialPort/QSerialPortInfo"
+
 using namespace std;
 //定义在头文件内会提示未定义函数，很奇怪
 bool ConnectDevice(DiagInfo &);
@@ -24,7 +29,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     //添加命令行参数
     QCoreApplication::setApplicationName("QCNTool");
-    QCoreApplication::setApplicationVersion("1.4.9");
+    QCoreApplication::setApplicationVersion("1.5.0");
     QCommandLineParser parser;
     parser.setApplicationDescription("a tool to download/flash qcn from/to your phone");
     parser.addHelpOption();
@@ -39,18 +44,16 @@ int main(int argc, char *argv[])
     QCommandLineOption targetpath(QStringList() << "f" << "file",
                                   "qcn file path",
                                   "string");
-    QCommandLineOption targetname(QStringList() << "n" << "name",
-                                  "qcn file name",
-                                  "string");
+
     parser.addOption(targetport);
     parser.addOption(targetpath);
-    parser.addOption(targetname);
+
     parser.addOption(writeqcn);
     parser.addOption(readqcn);
     parser.process(a);
     int cport= parser.value(targetport).toInt();
     QString cpath = parser.value(targetpath);
-    QString cname = parser.value(targetname);
+
     DiagInfo info;
     info.portnum = cport;
 
@@ -87,6 +90,11 @@ int main(int argc, char *argv[])
             return 1;
 
         }
+        QFileInfo fi(cpath);
+        if (!fi.isFile()){
+            std::cout << "invalid file input";
+            return 1;
+        }
         std::cout << "\nLoading Data File...";
         int get1 = -1;
         int get2 = -1;
@@ -116,14 +124,16 @@ int main(int argc, char *argv[])
         if (cpath == "")
         {
             cpath = QDir().currentPath();
+            QDateTime dteNow = QDateTime::currentDateTime();
+            QString fnl = dteNow.toString("smh_d_M_yyyy").replace(" ","_").replace(":","_");
+            path = QDir::cleanPath(cpath +QDir::separator()+ "QCN_"+fnl+".qcn");
         }
-        if (cname == "")
+        else
         {
-        QDateTime dteNow = QDateTime::currentDateTime();
-        QString fnl = dteNow.toString("smh_d_M_yyyy").replace(" ","_").replace(":","_");
-        cname = "QCN_"+fnl+".qcn";
+            std::cout <<"file path should be null";
+            return 1;
         }
-        path = QDir::cleanPath(cpath +QDir::separator()+ cname);
+
         int renas2;
         std::cout << "\nReading QCN from phone...";
         if (!QLIB_BackupNVFromMobileToQCN(info.hndl,path.toLocal8Bit().data(),&renas2))
