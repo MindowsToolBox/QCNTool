@@ -1,4 +1,8 @@
-#include "main.h"
+#include "QThread"
+#include "QtCore"
+#include "QCLoader.h"
+#include "QtSerialPort/QSerialPort"
+#include "QtSerialPort/QSerialPortInfo"
 #include <iostream>
 using namespace std;
 
