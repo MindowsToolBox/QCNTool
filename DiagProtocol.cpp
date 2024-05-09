@@ -197,7 +197,7 @@ bool SendSPC(DiagInfo & info,QString SPC)
     }else{
         std::cout << " error";
     }
-    return true;
+    return false;
 }
 
 bool ConnectDevice(DiagInfo &info)
